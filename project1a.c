@@ -1,14 +1,10 @@
-//  board—a 9 by 9 array of integers that represents the current state of the puzzle, where 0 indicates a blank square 
-//  start—a 9 by 9 array of boolean values that indicates which squares in board are given values that cannot be changed and the following methods:  
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
 
-int a = 5;
-
 void addGuess(int start[][9],int board[][9], int row, int col, int value){
     if (start[row][col]){
+		printf("\n\n\nWorked\n\n\n");
         board[row][col]=value;
     }
 }
@@ -254,43 +250,69 @@ void display(int board[][9]) {
 void main() {
 	// Variable controlling whether or not the user is done
 	int done = 0;
+	// Reset random sequence
 	srand(time(NULL));
 
 	// Game loop itself
 	while (!done) {
-		// Sipmle introduction for the user.
-		
+
+		// Sipmle introduction for the user
 		printf("Welcome to this game of Sudoku.\n");
 		printf("Rules are simple.\n");
 		printf("Fill the board up with numbers. The row, column, or 3x3 square can have the same number within it.\n");
 		printf("Hint: 0 represents an empty square\n");
 
 		int board[9][9]; // The board that will be used in the game
-		int defaultBoard[9][9];
-		int start[9][9];
-		createSudokuPuzzle(board, defaultBoard, start);
+		int defaultBoard[9][9]; // Default board incase user wants to reset
+		int start[9][9]; // Where you can and cannot change values
+		createSudokuPuzzle(board, defaultBoard, start); // Create the sudoku puzzle
 
-		int gameStillGoing = 1;
+		int gameStillGoing = 1; // This means the game is still going
 		
 		display(board);
+		
 		while (gameStillGoing) {
+			// Sets up values for coordinate insertion
 			printf("\n\n");
 			int x, y, z;
-		//	printf("Would you like to see allowed values for a specific coordinate? ");
-		//	printf("1. Yes\n 2. No\n");
 
-//			int seeValues = 0;
-//			scanf("%d", &seeValues)
+			// Check if the user wants to see the allowed values for a specific spot
+			printf("Would you like to see allowed values for a specific coordinate?\n");
+			printf("1. Yes\n2. No\n");
+
+			// Get the user input
+			int seeValues = 0;
+			scanf("%d", &seeValues);
 			
+			if (seeValues == 1) {
+				printf("Enter the x coord: ");
+				scanf("%d", &x);
+				x = (x-9);
+				if (x < 0)
+					x *=1;
+
+				printf("Enter the y coord: ");
+				scanf("%d", &y);
+
+				// Get and display allowed values
+				int valid[9];
+				getAllowedValues(board, y, x, valid);
+				printf("Allowed Values here are: ");
+				for (int i = 0; i < 9; i++) {
+					if (valid[0]) {
+						printf("%d ", i + 1);
+					}
+				}
+			}
+				
+			
+			printf("\nEnter values for Insertion\n");
 			printf("Enter the x coord: ");
 			scanf("%d", &x);
-			x = (x-9);
-			if (x < 0) {
-				x *=1;
-			}
 
 			printf("Enter the y coord: ");
 			scanf("%d", &y);
+			y = (y-8) * -1;
 
 			printf("Enter the value you would like to put in: ");
 			scanf("%d", &z);
@@ -301,7 +323,6 @@ void main() {
 			printf("\n\n");
 
 			if(! checkValue(board, y, x, z)) {
-			//if(! checkPuzzle(board)) {
 				printf("This value will not work. Feel free to change it.\n");
 			}
 
@@ -326,11 +347,9 @@ void main() {
 			*/
 
 		}
-
-		printf("Would you like to play again?\n");
-		printf("1. Yes\n");
-		printf("2. No\n");
-
+			
+		// Ask if user wants to play again
+		printf("Would you like to play again?\n1. Yes\n2. No\n");
 		scanf("%d", &done);
 
 		if(done == 1)
@@ -338,6 +357,7 @@ void main() {
 		else
 			done = 1;
 
+		// Reset board if so
 		reset(defaultBoard, board);
 	}
 
