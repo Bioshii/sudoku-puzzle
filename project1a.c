@@ -2,9 +2,8 @@
 #include<stdlib.h>
 #include<time.h>
 
-void addGuess(int start[][9],int board[][9], int row, int col, int value){
+addGuess(int start[][9],int board[][9], int row, int col, int value){
     if (start[row][col]){
-		printf("\n\n\nWorked\n\n\n");
         board[row][col]=value;
     }
 }
@@ -79,7 +78,7 @@ int checkValue(int board[][9], int row, int col, int value) {
 				
 		// Check per col
 		if (board[k][j] == value && k != i) {
-	return 0;
+			return 0;
 		}
 	}
 
@@ -98,7 +97,7 @@ int checkValue(int board[][9], int row, int col, int value) {
 	if (col < 3) {
 		startCol = 0;
 	} else if (col < 6) {
-		startRow = 3;
+		startCol = 3;
 	} else {
 		startCol = 6;
 	}
@@ -139,10 +138,8 @@ void reset(int defaultBoard[9][9], int board[9][9]){
 }
 
 void getAllowedValues(int board[][9], int row, int col, int arr[]){
-	//printf("Did we start loop\n");
     for(int i = 1; i < 10; i++){
-        if(checkValue(board, row, col, i)){
-		//if(checkPuzzle(board)) {
+        if(checkValue(board, row, col, i)) {
             arr[i-1]=1;
         }else{
             arr[i-1]=0;
@@ -269,7 +266,7 @@ void main() {
 
 		int gameStillGoing = 1; // This means the game is still going
 		
-		display(board);
+		display(board); 
 		
 		while (gameStillGoing) {
 			// Sets up values for coordinate insertion
@@ -277,51 +274,72 @@ void main() {
 			int x, y, z;
 
 			// Check if the user wants to see the allowed values for a specific spot
-			printf("Would you like to see allowed values for a specific coordinate?\n");
-			printf("1. Yes\n2. No\n");
+			printf("Would you like to see allowed values for a specific coordinate?\n1. Yes\n2. No\n");
 
 			// Get the user input
 			int seeValues = 0;
 			scanf("%d", &seeValues);
-			
-			if (seeValues == 1) {
-				printf("Enter the x coord: ");
-				scanf("%d", &x);
-				x = (x-9);
-				if (x < 0)
-					x *=1;
 
-				printf("Enter the y coord: ");
-				scanf("%d", &y);
+			int goodToGo = 1;
+			
+			// If they want to see valid values, display them
+			if (seeValues == 1) {
+				do {
+					printf("Enter the x coord: ");
+					scanf("%d", &x);
+
+					printf("Enter the y coord: ");
+					scanf("%d", &y);
+					y = (y-8) * -1;
+				    if (x < 0 || x > 8 || y < 0 || y > 8) {
+						goodToGo = 0;
+						printf("Values not valid. Must be greater than or equal to 0 or less than and equal to 8\n");
+					} else
+						goodToGo = 1;
+				} while (!goodToGo);
 
 				// Get and display allowed values
-				int valid[9];
-				getAllowedValues(board, y, x, valid);
+				int validValues[9];
+				getAllowedValues(board, y, x, validValues);
 				printf("Allowed Values here are: ");
 				for (int i = 0; i < 9; i++) {
-					if (valid[0]) {
+					if (validValues[i]) {
 						printf("%d ", i + 1);
 					}
 				}
+				printf("\n");
 			}
 				
 			
+			// Insert Some Values
 			printf("\nEnter values for Insertion\n");
-			printf("Enter the x coord: ");
-			scanf("%d", &x);
+			do {
+				printf("Enter the x coord: ");
+				scanf("%d", &x);
 
-			printf("Enter the y coord: ");
-			scanf("%d", &y);
-			y = (y-8) * -1;
+				printf("Enter the y coord: ");
+				scanf("%d", &y);
+				y = (y-8) * -1;
 
-			printf("Enter the value you would like to put in: ");
-			scanf("%d", &z);
-
-			addGuess(start, board, y, x, z);
+				printf("Enter the value you would like to put in: ");
+				scanf("%d", &z);
 				
+				if (x < 0 || x > 8 || y < 0 || y > 8 || z < 0 || z > 8) {
+					goodToGo = 0;
+					printf("Values not valid. Must be greater than or equal to 0 or less than and equal to 8\n");
+				} else
+					goodToGo = 1;
+			} while (!goodToGo);
+			
+			
+
+			// Insert Player values
+			//
 			display(board);
 			printf("\n\n");
 
+
+			// If the value won't work, let them know and that they cna't change it
 			if(! checkValue(board, y, x, z)) {
 				printf("This value will not work. Feel free to change it.\n");
 			}
