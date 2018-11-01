@@ -2,19 +2,20 @@
 #include<stdlib.h>
 #include<time.h>
 
-addGuess(int start[][9],int board[][9], int row, int col, int value){
-    if (start[row][col]){
+void addGuess(int start[][9],int board[][9], int row, int col, int value){
+    //if (start[row][col]){
         board[row][col]=value;
-    }
+    //}
 }
 
 int checkPuzzle(int board[][9]) {
+	// Loop through every element on board
 	for (int i = 0; i < 9; i++) {
 		for (int j = 0; j < 9; j++) {
-			// i: will refer to row (aka x value)
-			// j: will refer to col (aka y value)
-			// int i = row;
-			// int j = col;
+
+			// i: refers to which row
+			// j: refers to which col
+		
 			for (int k = 0; k < 9; k++) {
 				// Check per row
 				if (board[i][k] == board[i][j] && k != j) {
@@ -28,6 +29,8 @@ int checkPuzzle(int board[][9]) {
 			}
 
 
+			// Get ready to compare boxes
+			// Get its specific box
 			int startRow = 0;
 			int startCol = 0;
 
@@ -48,6 +51,7 @@ int checkPuzzle(int board[][9]) {
 			}
 
 
+			// Each box is 3x3, so after getting starts check until +3
 			for (int m = startRow; m < startRow + 3; m++) {
 				for (int n = startCol; n < startCol + 3; n++) {
 					if(board[m][n] == board[i][j]) {
@@ -62,12 +66,9 @@ int checkPuzzle(int board[][9]) {
 
 }
 	
-
-// Idk if you want me to do the functions, so getAllowedValues can take a piece from checkpuzzle, and I think checkPuzzle can be changed a bit
-
 int checkValue(int board[][9], int row, int col, int value) {
-	// i: will refer to row (aka x value)
-	// j: will refer to col (aka y value)
+	// i: will refer to row
+	// j: will refer to col 
 	int i = row;
 	int j = col;
 	for (int k = 0; k < 9; k++) {
@@ -103,6 +104,7 @@ int checkValue(int board[][9], int row, int col, int value) {
 	}
 
 
+	// Each box is 3x3, so after getting starts check until +3
 	for (int m = startRow; m < startRow + 3; m++) {
 		for (int n = startCol; n < startCol + 3; n++) {
 			if(board[m][n] == value) {
@@ -149,7 +151,7 @@ void getAllowedValues(int board[][9], int row, int col, int arr[]){
 
 // Sets the given square to the given value as an initial value that cannot be changed by the puzzle solver
 void addInitial(int board[][9], int row, int col, int value) {
-	// This conditional will always be true, but to stop the error from being emitted
+	// This conditional will always be true, but to stop the error from emitting
 	if (row < 9 && row > -1 && col > -1 && col < 9)
 		board[row][col] = value;
 }
@@ -172,7 +174,7 @@ void createSudokuPuzzle(int board[9][9], int defaultBoard[9][9], int start[9][9]
 		int unique = 1;
 		do {
 			// What I'm doing here is, I'll generate a number between 0 and 100. How this applys to a board is:
-			// Every position is between 0 and 9 for columns and 0 and 9 for rows. Thsi means, a coordinate is always between
+			// Every position is between 0 and 9 for columns and 0 and 9 for rows. This means, a coordinate is always between
 			// 0, 0 and 9,9. Through this, the tens place can eb found and the ones place can be found to develop a coordinate point.
 			hereIsGood[i] = rand() % 100;
 			unique = 1;
@@ -192,15 +194,16 @@ void createSudokuPuzzle(int board[9][9], int defaultBoard[9][9], int start[9][9]
 
 		start[x][y] = 0;
 			
-		int gotItIn = 0;
-		int valid[9];
+		int gotItIn = 0; // to exit loop once we insert value
+		int valid[9];    // List of valid values
 			
 		while(!gotItIn) {
 			int value = (rand() % 9) + 1; 
 			getAllowedValues(board, x, y, valid);
 
-			if (valid[value-1]) { //Uncomment this for real program
-				addInitial(board, x, y, value); //Uncomment this for real program
+			// If the value is valid for that spot, add it to the current and default board and update flag variable
+			if (valid[value-1]) { 
+				addInitial(board, x, y, value);
 				addInitial(defaultBoard, x, y, value);
 				gotItIn = 1;
 			}
@@ -291,12 +294,15 @@ void main() {
 					printf("Enter the y coord: ");
 					scanf("%d", &y);
 					y = (y-8) * -1;
+
+					// Check for out of bouds
 				    if (x < 0 || x > 8 || y < 0 || y > 8) {
 						goodToGo = 0;
 						printf("Values not valid. Must be greater than or equal to 0 or less than and equal to 8\n");
 					} else
 						goodToGo = 1;
 				} while (!goodToGo);
+
 
 				// Get and display allowed values
 				int validValues[9];
@@ -324,6 +330,7 @@ void main() {
 				printf("Enter the value you would like to put in: ");
 				scanf("%d", &z);
 				
+				// Check for out of bouds
 				if (x < 0 || x > 8 || y < 0 || y > 8 || z < 0 || z > 8) {
 					goodToGo = 0;
 					printf("Values not valid. Must be greater than or equal to 0 or less than and equal to 8\n");
@@ -335,7 +342,6 @@ void main() {
 
 			// Insert Player values
 			//
-			display(board);
 			printf("\n\n");
 
 
@@ -344,27 +350,38 @@ void main() {
 				printf("This value will not work. Feel free to change it.\n");
 			}
 
-			/*
+
+			addGuess(start, board, y, x, z);
+
 			
+			display(board);
+
+
+			
+			// Check if the game is done
 			if(isFull(board) && checkPuzzle(board)) {
 				printf("\nYou win!\n");
 				gameStillGoing = 0;
+			// Check if all values are full but puzzle isn't corret
 			} else if(isFull(board) && ! checkPuzzle(board)) {
 				printf("\nYou lose!\n");
-				printf("Would you like to reset the board and try again?");
-				printf("1. Yes\n2. No\n");
-				int userChoice = 0;
+				printf("Would you like to reset the board and try again?\n1. Yes\n2. No\n");
+
+				int userChoice;
+				scanf("%d", &userChoice);
+
+				// DO as user wants
 				if (userChoice == 1) {
 					reset(defaultBoard, board);
 					printf("Reset!\n");
+					display(board);
 				} else {
 					printf("Cya!\n");
 					gameStillGoing = 0;
 				}
 			}
-			*/
 
-		}
+		} // End of game current game loop
 			
 		// Ask if user wants to play again
 		printf("Would you like to play again?\n1. Yes\n2. No\n");
